@@ -4,13 +4,13 @@ const { mediaKeys, gameKeys, arrowKeys } = require("./presets");
 const filePath = "config.json";
 
 let config = { preset: "media", id: null };
+
 try {
   config = JSON.parse(fs.readFileSync(filePath));
+  console.log(config);
 } catch (error) {
   console.log(error);
 }
-
-changePreset(config.preset);
 
 const keyIds = ["top", "left", "middle", "right", "bottom"];
 let keyElements = [];
@@ -24,33 +24,6 @@ const setValueInKeyInputs = preset => {
     el.value = preset[i];
   });
 };
-
-keyElements.forEach((el, i) => {
-  let code;
-  el.addEventListener("keydown", e => {
-    e.preventDefault();
-    console.log(e.key);
-    if (!code) {
-      code = e.key;
-    } else {
-      code += `+${e.key}`;
-    }
-    el.value = code;
-  });
-});
-
-const otherIDs = ["presets", "resetBtn", "saveBtn", "controllerValues"];
-let elements = {};
-
-otherIDs.forEach(e => {
-  elements[e] = document.querySelector(`#${e}`);
-});
-
-// fs.writeFileSync("config.txt", code);
-
-elements.resetBtn.addEventListener("click", () => {
-  elements.controllerValues.reset();
-});
 
 const changePreset = preset => {
   switch (preset) {
@@ -69,9 +42,42 @@ const changePreset = preset => {
   }
 };
 
+keyElements.forEach((el, i) => {
+  let code;
+  el.addEventListener("keydown", e => {
+    e.preventDefault();
+    console.log(e.key);
+    //only change value when custom is selected
+    if (config.preset === "custom") {
+      if (!code) {
+        code = e.key;
+      } else {
+        code += `+${e.key}`;
+      }
+      el.value = code;
+    }
+  });
+});
+
+const otherIDs = ["presets", "resetBtn", "saveBtn", "controllerValues"];
+let elements = {};
+
+otherIDs.forEach(e => {
+  elements[e] = document.querySelector(`#${e}`);
+});
+
+elements.resetBtn.addEventListener("click", () => {
+  elements.controllerValues.reset();
+});
+
+elements.presets.value = config.preset;
+changePreset(config.preset);
+
 elements.presets.addEventListener("change", e => {
   console.log(e.target.value);
   const value = e.target.value;
   config.preset = value;
   changePreset(value);
+
+  fs.writeFileSync(filePath, JSON.stringify(config));
 });
