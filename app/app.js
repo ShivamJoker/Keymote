@@ -42,8 +42,8 @@ const changePreset = preset => {
   }
 };
 
+let code;
 keyElements.forEach((el, i) => {
-  let code;
   el.addEventListener("keydown", e => {
     e.preventDefault();
     console.log(e.key);
@@ -57,6 +57,9 @@ keyElements.forEach((el, i) => {
       el.value = code;
     }
   });
+  el.addEventListener("focus", () => {
+    code = "";
+  });
 });
 
 const otherIDs = ["presets", "resetBtn", "saveBtn", "controllerValues"];
@@ -68,6 +71,9 @@ otherIDs.forEach(e => {
 
 elements.resetBtn.addEventListener("click", () => {
   elements.controllerValues.reset();
+  config.preset = "custom";
+  elements.presets.value = config.preset;
+  code = "";
 });
 
 elements.presets.value = config.preset;
@@ -78,6 +84,8 @@ elements.presets.addEventListener("change", e => {
   const value = e.target.value;
   config.preset = value;
   changePreset(value);
+});
 
+elements.saveBtn.addEventListener("click", () => {
   fs.writeFileSync(filePath, JSON.stringify(config));
 });
