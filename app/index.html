@@ -10,7 +10,12 @@
     <div class="header-arrow"></div>
     <div class="window">
       <header class="title">
-        <span id="statusIndicator">◉</span>
+        <span id="statusIndicator">
+          <div class="ball-scale-multiple">
+            <div></div>
+            <div></div>
+          </div>
+        </span>
         <h4>Wi-Remote</h4>
         <span id="settingsBtn">⚙</span>
       </header>
@@ -48,18 +53,25 @@
           <h3>Or Type the code in your app</h3>
           <input type="text" name="" id="loginCode" value="123456" disabled />
         </div>
-        <div id="connectingPage">
-          <h3>Waiting For Connection</h3>
 
-          <div class="ball-scale-multiple">
-            <div></div>
-            <div></div>
-          </div>
+        <div class="ipContainer">
+          <span>IP - </span>
+          <spam id="ip">
+            Loading
+          </span>
+        </div>
+        <div class="connection-mode-container">
+          <span id="lanBtn" class="active">LAN</span>
+          <span id="wanBtn">WAN</span>
         </div>
       </div>
-      <div class="connection-mode-container">
-        <span class="active">LAN</span>
-        <span>WAN</span>
+      <div id="connectedPage">
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+          <circle class="path circle" fill="none" stroke="#ffffff" stroke-width="6" stroke-miterlimit="10" cx="65.1" cy="65.1" r="62.1"/>
+          <polyline class="path check" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" points="100.2,40.2 51.5,88.8 29.8,67.5 "/>
+        </svg>
+      <h3>Connected To Remote</h3>
+
       </div>
     </div>
 

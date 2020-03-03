@@ -1,5 +1,7 @@
 const { app, BrowserWindow, ipcMain, Tray } = require("electron");
 const path = require("path");
+require('electron-reload')(__dirname);
+
 
 let tray = undefined;
 let window = undefined;

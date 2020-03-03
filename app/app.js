@@ -1,5 +1,7 @@
 const fs = require("fs");
 const crypto = require("crypto");
+const ip = require("ip");
+
 const qrcode = new QRCode("qrcode", { width: 160, height: 160 });
 
 //get a 6 digit no. using node crypto module
@@ -82,7 +84,10 @@ const otherIDs = [
   "loginCode",
   "settingsBtn",
   "settingsPage",
-  "loginPage"
+  "loginPage",
+  "lanBtn",
+  "wanBtn",
+  "ip"
 ];
 let elements = {};
 
@@ -121,3 +126,19 @@ elements.settingsBtn.addEventListener("click", () => {
   elements.settingsPage.style.display = "flex";
 });
 
+//configure the wan and wan button
+elements.wanBtn.addEventListener("click", () => {
+  elements.wanBtn.classList.add("active");
+  elements.lanBtn.classList.remove("active");
+  elements.ip.parentElement.style.display = "none";
+});
+
+//configure the lan and wan button
+elements.lanBtn.addEventListener("click", () => {
+  elements.wanBtn.classList.remove("active");
+  elements.lanBtn.classList.add("active");
+  elements.ip.parentElement.style.display = "inline";
+});
+
+//get and set ip
+elements.ip.innerText = ip.address();
