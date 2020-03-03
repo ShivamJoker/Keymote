@@ -5,7 +5,7 @@ var bonjour = require('bonjour')()
 
 bonjour.unpublishAll()
 
-bonjour.publish({ name: 'wifi =d=f-dremote', host: 'hello.local', type: 'http', port: 8080 })
+bonjour.publish({ name: 'wifi remote', host: 'hello.local', type: 'http', port: 8080 })
  
 // browse for all http services
 bonjour.find({ type: 'http' }, function (service) {

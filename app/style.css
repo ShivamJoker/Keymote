@@ -227,3 +227,31 @@ button:active {
   height: 90px;
   animation: ball-scale-multiple 1.2s 0s ease-out infinite;
 }
+/* ripple effect ends */
+
+.connection-mode-container {
+  width: 120px;
+  height: 30px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  color: var(--light-color);
+}
+
+.connection-mode-container span {
+  width: 50%;
+  height: 100%;
+  text-align: center;
+  line-height: 30px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.connection-mode-container .active{
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--dark-color);
+}
