@@ -15,7 +15,7 @@ app.on("ready", () => {
 });
 
 const createTray = () => {
-  tray = new Tray((path.join(__dirname,"/icons/icon.png")));
+  tray = new Tray((path.join(__dirname,"/icons/iconTemplate.png")));
   tray.on("click", function(event) {
     toggleWindow();
   });

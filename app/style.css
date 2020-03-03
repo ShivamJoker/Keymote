@@ -46,15 +46,21 @@
   text-align: center;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content:center;
+  position: relative;
 }
 .title span {
-  margin: 0 15px;
+  position: absolute;
   cursor: pointer;
 }
 
 #settingsBtn {
   font-size: 22px;
+  right: 15px;
+}
+
+#statusIndicator {
+  left: 15px;
 }
 
 #settingsPage {
@@ -74,10 +80,8 @@
 }
 
 #loginPage {
-  display: none;
+  /* display: none; */
 }
-
-
 
 #settingsPage {
   width: 100%;
@@ -232,13 +236,13 @@ button:active {
 /* ripple effect ends */
 
 /* Animated Tick status */
-#connectedPage svg{
- width: 40%;
- 
+#connectedPage svg {
+  width: 130px;
 }
 
 #connectedPage {
   justify-content: space-evenly;
+  display: none;
 }
 
 .path {
@@ -256,7 +260,6 @@ button:active {
   stroke-dashoffset: -100;
   animation: dash-check 0.9s 0.35s ease-in-out forwards;
 }
-
 
 @keyframes dash {
   0% {

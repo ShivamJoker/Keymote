@@ -1,6 +1,9 @@
 const fs = require("fs");
 const crypto = require("crypto");
 const ip = require("ip");
+const WebSocket = require("ws");
+
+let isRemoteConnected = false;
 
 const qrcode = new QRCode("qrcode", { width: 160, height: 160 });
 
@@ -87,7 +90,9 @@ const otherIDs = [
   "loginPage",
   "lanBtn",
   "wanBtn",
-  "ip"
+  "ip",
+  "connectedPage",
+  "statusIndicator"
 ];
 let elements = {};
 
@@ -142,3 +147,22 @@ elements.lanBtn.addEventListener("click", () => {
 
 //get and set ip
 elements.ip.innerText = ip.address();
+
+//handle connection using web sockets
+const wss = new WebSocket.Server({ port: 5976, maxPayload: 50 });
+
+wss.on("connection", (ws, req) => {
+  const channel = req.url.slice(1, 7);
+  console.log(channel);
+  if (channel === config.id) {
+    elements.connectedPage.style.display = "flex";
+    elements.loginPage.style.display = "none";
+    elements.statusIndicator.style.display = "none"
+  }
+
+  ws.on("message", message => {
+    console.log(req.url);
+
+    console.log("received: %s", message);
+  });
+});
