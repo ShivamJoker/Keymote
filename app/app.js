@@ -2,6 +2,7 @@ const fs = require("fs");
 const crypto = require("crypto");
 const ip = require("ip");
 const WebSocket = require("ws");
+const robot = require("robotjs");
 
 let isRemoteConnected = false;
 
@@ -12,7 +13,7 @@ const randbytes = parseInt(crypto.randomBytes(3).toString("hex"), 16);
 const uniquieId = randbytes.toString().slice(0, 6);
 
 //array of ids which we are gonna select
-const { mediaKeys, gameKeys, arrowKeys } = require("./presets");
+const { mediaKeys, gameKeys, arrowKeys, simulateKey } = require("./presets");
 const filePath = "config.json";
 
 let config = { preset: "media", id: null };
@@ -155,14 +156,28 @@ wss.on("connection", (ws, req) => {
   const channel = req.url.slice(1, 7);
   console.log(channel);
   if (channel === config.id) {
+    //ui update to show the connected screen
     elements.connectedPage.style.display = "flex";
     elements.loginPage.style.display = "none";
-    elements.statusIndicator.style.display = "none"
+    elements.statusIndicator.style.display = "none";
+
+    //change variable
+    isRemoteConnected = true;
   }
 
   ws.on("message", message => {
     console.log(req.url);
 
+    simulateKey(message, config.preset);
     console.log("received: %s", message);
+  });
+
+  ws.on("close", () => {
+    console.log("disconnected");
+    isRemoteConnected = false;
+    //ui update to show the login screen
+    elements.connectedPage.style.display = "none";
+    elements.loginPage.style.display = "flex";
+    elements.statusIndicator.style.display = "flex";
   });
 });

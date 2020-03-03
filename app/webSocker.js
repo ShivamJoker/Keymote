@@ -7,4 +7,5 @@ const ws = new WebSocket('ws://localhost:5976/350335', {
 
 ws.on('open', function open() {
   ws.send('something');
+  // ws.close()
 });
