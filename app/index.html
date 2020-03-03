@@ -9,33 +9,61 @@
   <body>
     <div class="header-arrow"></div>
     <div class="window">
-      <h4 class="title">Wi-Remote</h4>
-      <div>
-        <label for="presets">Preset</label>
-        <select id="presets" name="Keyboard Presets">
-          <option value="media">Media</option>
-          <option value="gaming">Gaming</option>
-          <option value="arrow">Arrows</option>
-          <option value="custom">Custom</option>
-        </select>
-      </div>
+      <header class="title">
+        <span id="statusIndicator">◉</span>
+        <h4>Wi-Remote</h4>
+        <span id="settingsBtn">⚙</span>
+      </header>
 
-      <form id="controllerValues" autocomplete="off">
-        <input type="text" placeholder="Press" id="top" />
-        <div>
-          <input placeholder="Your" type="text" id="left" />
-          <input placeholder="Keys" type="text" id="middle" />
-          <input placeholder="In The" type="text" id="right" />
+      <div id="settingsPage">
+        <div class="presetContainer">
+          <label for="presets">Preset</label>
+          <select id="presets" name="Keyboard Presets">
+            <option value="media">Media</option>
+            <option value="gaming">Gaming</option>
+            <option value="arrow">Arrows</option>
+            <option value="custom">Custom</option>
+          </select>
         </div>
-        <input type="text" placeholder="Box" id="bottom" />
-      </form>
 
-      <div class="actionBtnContainer">
-        <button class="actionBtn" id="resetBtn">Reset</button
-        ><button class="actionBtn" id="saveBtn">Save</button>
+        <form id="controllerValues" autocomplete="off">
+          <input type="text" placeholder="Press" id="top" />
+          <div>
+            <input placeholder="Your" type="text" id="left" />
+            <input placeholder="Keys" type="text" id="middle" />
+            <input placeholder="In The" type="text" id="right" />
+          </div>
+          <input type="text" placeholder="Box" id="bottom" />
+        </form>
+
+        <div class="actionBtnContainer">
+          <button class="actionBtn" id="resetBtn">Reset</button
+          ><button class="actionBtn" id="saveBtn">Save</button>
+        </div>
+      </div>
+      <div id="loginPage">
+        <div id="qrPage">
+          <h3>Scan the QR code to connect</h3>
+          <div id="qrcode"></div>
+          <h3>Or Type the code in your app</h3>
+          <input type="text" name="" id="loginCode" value="123456" disabled />
+        </div>
+        <div id="connectingPage">
+          <h3>Waiting For Connection</h3>
+
+          <div class="ball-scale-multiple">
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+      <div class="mode">
+        <span>LAN</span>
+        <span>WAN</span>
       </div>
     </div>
 
+    <script src="./qrcode.min.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>

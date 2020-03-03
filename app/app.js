@@ -1,4 +1,11 @@
 const fs = require("fs");
+const crypto = require("crypto");
+const qrcode = new QRCode("qrcode", { width: 160, height: 160 });
+
+//get a 6 digit no. using node crypto module
+const randbytes = parseInt(crypto.randomBytes(3).toString("hex"), 16);
+const uniquieId = randbytes.toString().slice(0, 6);
+
 //array of ids which we are gonna select
 const { mediaKeys, gameKeys, arrowKeys } = require("./presets");
 const filePath = "config.json";
@@ -9,8 +16,13 @@ try {
   config = JSON.parse(fs.readFileSync(filePath));
   console.log(config);
 } catch (error) {
+  //if no file then assign the new id
+  config.id = uniquieId;
   console.log(error);
 }
+
+//also generate a qr code
+qrcode.makeCode(config.id);
 
 const keyIds = ["top", "left", "middle", "right", "bottom"];
 let keyElements = [];
@@ -62,7 +74,16 @@ keyElements.forEach((el, i) => {
   });
 });
 
-const otherIDs = ["presets", "resetBtn", "saveBtn", "controllerValues"];
+const otherIDs = [
+  "presets",
+  "resetBtn",
+  "saveBtn",
+  "controllerValues",
+  "loginCode",
+  "settingsBtn",
+  "settingsPage",
+  "loginPage"
+];
 let elements = {};
 
 otherIDs.forEach(e => {
@@ -76,6 +97,8 @@ elements.resetBtn.addEventListener("click", () => {
   code = "";
 });
 
+elements.loginCode.value = config.id;
+
 elements.presets.value = config.preset;
 changePreset(config.preset);
 
@@ -88,4 +111,13 @@ elements.presets.addEventListener("change", e => {
 
 elements.saveBtn.addEventListener("click", () => {
   fs.writeFileSync(filePath, JSON.stringify(config));
+  elements.loginPage.style.display = "flex";
+  elements.settingsPage.style.display = "none";
 });
+
+//when user clicks on setting the settings view
+elements.settingsBtn.addEventListener("click", () => {
+  elements.loginPage.style.display = "none";
+  elements.settingsPage.style.display = "flex";
+});
+

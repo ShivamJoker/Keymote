@@ -13,7 +13,7 @@ app.on("ready", () => {
 });
 
 const createTray = () => {
-  tray = new Tray(path.join("icons/icon.png"));
+  tray = new Tray((path.join(__dirname,"/icons/icon.png")));
   tray.on("click", function(event) {
     toggleWindow();
   });
@@ -37,7 +37,7 @@ const getWindowPosition = () => {
 const createWindow = () => {
   window = new BrowserWindow({
     // width: 320,
-    // height: 380,
+    // height: 420,
     width: 1000,
     height: 750,
     show: false,
