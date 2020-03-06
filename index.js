@@ -1,17 +1,19 @@
-const { app, BrowserWindow, ipcMain, Tray } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, win, Menu } = require("electron");
 const path = require("path");
 const robot = require("robotjs");
 
-// require("electron-reload")(__dirname);
-
-
+let isWindows = false;
 let tray = undefined;
 let window = undefined;
+let isQuiting = undefined;
 
-app.allowRendererProcessReuse = false;
+if (process.platform === "win32") {
+  isWindows = true;
+}
 
-// Don't show the app in the doc
-app.dock.hide();
+app.on("before-quit", function() {
+  isQuiting = true;
+});
 
 app.on("ready", () => {
   createTray();
@@ -19,25 +21,64 @@ app.on("ready", () => {
 });
 
 const createTray = () => {
-  tray = new Tray(path.join(__dirname, "/icons/iconTemplate.png"));
+  //if its windows we will use cwd and show an icon
+  if (isWindows) {
+    tray = new Tray(path.join(process.cwd(), "/icons/iconTemplate.png"));
+  } else {
+    tray = new Tray(path.join(__dirname, "/icons/iconTemplate.png"));
+  }
+
+  // Don't show the app in the mac doc
+  if (app.dock) app.dock.hide();
+
   tray.on("click", function(event) {
-    toggleWindow();
+    if (process.platform === "win32") {
+      tray.on("click", tray.popUpContextMenu);
+    }
+    tray.setContextMenu(
+      Menu.buildFromTemplate([
+        {
+          label: "Show App",
+          click: function() {
+            showWindow();
+          }
+        },
+        {
+          label: "Quit",
+          click: function() {
+            isQuiting = true;
+            app.quit();
+          }
+        }
+      ])
+    );
   });
+
+  tray.setToolTip("Keymote");
 };
 
 const getWindowPosition = () => {
   const windowBounds = window.getBounds();
   const trayBounds = tray.getBounds();
 
-  // Center window horizontally below the tray icon
-  const x = Math.round(
-    trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
-  );
-
-  // Position window 4 pixels vertically below the tray icon
-  const y = Math.round(trayBounds.y + trayBounds.height + 4);
-
-  return { x: x, y: y };
+  //different position on mac and windows
+  if (isWindows) {
+    // Center window horizontally abpve the tray icon
+    const x = Math.round(
+      trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
+    );
+    // Position window 4 pixels vertically above the tray icon
+    const y = Math.round(trayBounds.y + trayBounds.height - 500);
+    return { x: x, y: y };
+  } else {
+    // Center window horizontally below the tray icon
+    const x = Math.round(
+      trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
+    );
+    // Position window 4 pixels vertically below the tray icon
+    const y = Math.round(trayBounds.y + trayBounds.height + 4);
+    return { x: x, y: y };
+  }
 };
 
 const createWindow = () => {
@@ -46,9 +87,9 @@ const createWindow = () => {
     height: 430,
     // width: 1000,
     // height: 750,
-    show: false,
+    show: true,
     frame: false,
-    fullscreenable: false,
+    fullscreenable: true,
     resizable: false,
     transparent: true,
     webPreferences: {
@@ -57,7 +98,23 @@ const createWindow = () => {
     }
   });
 
-  window.loadURL(`file://${path.join(__dirname, "/app/index.html")}`);
+  const position = getWindowPosition();
+  window.setPosition(position.x, position.y, false);
+
+  window.on("close", function(event) {
+    if (!isQuiting) {
+      event.preventDefault();
+      window.hide();
+      event.returnValue = false;
+    }
+  });
+
+  window.loadURL(
+    `file://${path.join(
+      isWindows ? process.cwd() : __dirname,
+      "/app/index.html"
+    )}`
+  );
 
   // Hide the window when it loses focus
   window.on("blur", () => {
