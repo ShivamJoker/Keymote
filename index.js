@@ -1,10 +1,14 @@
 const { app, BrowserWindow, ipcMain, Tray } = require("electron");
 const path = require("path");
-require('electron-reload')(__dirname);
+const robot = require("robotjs");
+
+// require("electron-reload")(__dirname);
 
 
 let tray = undefined;
 let window = undefined;
+
+app.allowRendererProcessReuse = false;
 
 // Don't show the app in the doc
 app.dock.hide();
@@ -15,7 +19,7 @@ app.on("ready", () => {
 });
 
 const createTray = () => {
-  tray = new Tray((path.join(__dirname,"/icons/iconTemplate.png")));
+  tray = new Tray(path.join(__dirname, "/icons/iconTemplate.png"));
   tray.on("click", function(event) {
     toggleWindow();
   });
@@ -38,10 +42,10 @@ const getWindowPosition = () => {
 
 const createWindow = () => {
   window = new BrowserWindow({
-    // width: 320,
-    // height: 420,
-    width: 1000,
-    height: 750,
+    width: 320,
+    height: 430,
+    // width: 1000,
+    // height: 750,
     show: false,
     frame: false,
     fullscreenable: false,
