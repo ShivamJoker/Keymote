@@ -1,19 +1,20 @@
-const { app, BrowserWindow, ipcMain, Tray, win, Menu} = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, win, Menu } = require("electron");
 const path = require("path");
-require('electron-reload')(process.cwd(), {
-    electron: path.join(process.cwd(), 'node_modules', '.bin', 'electron.cmd')
-});
+const robot = require("robotjs");
 
-
+let isWindows = false;
 let tray = undefined;
 let window = undefined;
 let isQuiting = undefined;
+let browserWindow = undefined;
 
+if (process.platform === "win32") {
+  isWindows = true;
+}
 
-app.on('before-quit', function () {
+app.on("before-quit", function() {
   isQuiting = true;
 });
-
 
 app.on("ready", () => {
   createTray();
@@ -21,53 +22,80 @@ app.on("ready", () => {
 });
 
 const createTray = () => {
-	// Don't show the app in the doc
-  	if (app.dock) app.dock.hide();
-
-  tray = new Tray((path.join(process.cwd(),"/icons/iconTemplate.png")));
-  tray.on("click", function(event) {
-
-    if (process.platform === 'win32') {
-    tray.on('click', tray.popUpContextMenu);
+  //if its windows we will use cwd and show an icon
+  if (isWindows) {
+    tray = new Tray(path.join(process.cwd(), "/icons/iconTemplate.png"));
+  } else {
+    tray = new Tray(path.join(__dirname, "/icons/iconTemplate.png"));
   }
-    tray.setContextMenu(Menu.buildFromTemplate([
-    {
-      label: 'Show App', click: function () {
-        showWindow();
-      }
-    },
-    {
-      label: 'Quit', click: function () {
-        isQuiting = true;
-        app.quit();
-      }
+
+  // Don't show the app in the mac doc
+  if (app.dock) app.dock.hide();
+
+  tray.on("click", event => {
+    const { getStatus } = require("./app/status");
+
+    console.log(getStatus());
+
+    if (!getStatus()) {
+      showWindow();
+      return 0;
     }
-  ]));
+
+    if (isWindows) {
+      tray.on("click", tray.popUpContextMenu);
+    }
+
+    tray.setContextMenu(
+      Menu.buildFromTemplate([
+        {
+          label: "Show App",
+          click: function() {
+            showWindow();
+          }
+        },
+        {
+          label: "Quit",
+          click: function() {
+            isQuiting = true;
+            app.quit();
+          }
+        }
+      ])
+    );
   });
 
-  tray.setToolTip('Keymote');
-  
+  tray.setToolTip("Keymote");
 };
 
 const getWindowPosition = () => {
   const windowBounds = window.getBounds();
   const trayBounds = tray.getBounds();
 
-  // Center window horizontally abpve the tray icon
-  const x = Math.round(
-    trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
-  );
-
-  // Position window 4 pixels vertically above the tray icon
-  const y = Math.round(trayBounds.y + trayBounds.height - 500);
-
-  return { x: x, y: y };
+  //different position on mac and windows
+  if (isWindows) {
+    // Center window horizontally abpve the tray icon
+    const x = Math.round(
+      trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
+    );
+    // Position window 4 pixels vertically above the tray icon
+    const y = Math.round(trayBounds.y + trayBounds.height - 500);
+    return { x: x, y: y };
+  } else {
+    // Center window horizontally below the tray icon
+    const x = Math.round(
+      trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
+    );
+    // Position window 4 pixels vertically below the tray icon
+    const y = Math.round(trayBounds.y + trayBounds.height + 4);
+    return { x: x, y: y };
+  }
 };
 
 const createWindow = () => {
   window = new BrowserWindow({
     width: 320,
-    height: 500,
+    height: 430,
     // width: 1000,
     // height: 750,
     show: true,
@@ -79,19 +107,39 @@ const createWindow = () => {
       backgroundThrottling: false,
       nodeIntegration: true
     }
-});
+  });
 
-    window.on('close', function (event) {
+  browserWindow = new BrowserWindow({
+    show: false,
+    webPreferences: {
+      backgroundThrottling: false,
+      nodeIntegration: true
+    }
+    
+  });
+
+  const position = getWindowPosition();
+  window.setPosition(position.x, position.y, false);
+
+  window.on("close", function(event) {
     if (!isQuiting) {
       event.preventDefault();
       window.hide();
       event.returnValue = false;
     }
-  
-
   });
 
-  window.loadURL(`file://${path.join(process.cwd(), "/app/index.html")}`);
+  window.loadURL(
+    `file://${path.join(
+      isWindows ? process.cwd() : __dirname,
+      "/app/index.html"
+    )}`
+  );
+
+  browserWindow.loadURL(`file://${path.join(
+    isWindows ? process.cwd() : __dirname,
+    "/app/notification.html"
+  )}`);
 
   // Hide the window when it loses focus
   window.on("blur", () => {
@@ -109,9 +157,15 @@ const showWindow = () => {
   const position = getWindowPosition();
   window.setPosition(position.x, position.y, false);
   window.show();
+  browserWindow.webContents.send(
+    'show-notification',
+    'Keymote',
+    'App is running...'
+  );
 };
 
 
 ipcMain.on("show-window", () => {
   showWindow();
 });
+
