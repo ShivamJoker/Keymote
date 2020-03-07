@@ -3,8 +3,15 @@ const crypto = require("crypto");
 const ip = require("ip");
 const WebSocket = require("ws");
 const robot = require("robotjs");
+const { BrowserWindow } = require("electron");
 
-let isRemoteConnected = false;
+const https = require("https");
+
+const { getStatus, changeStatus } = require("./status");
+changeStatus(true);
+console.log("remote status", getStatus());
+
+import "./changeOnWin.js";
 
 const qrcode = new QRCode("qrcode", { width: 160, height: 160 });
 
@@ -27,16 +34,12 @@ try {
   console.log(error);
 }
 
-//also generate a qr code
-qrcode.makeCode(config.id);
-
-const keyIds = ["top", "left", "middle", "right", "bottom"];
+const keyIds = ["up", "left", "middle", "right", "down"];
 let keyElements = [];
 
 keyIds.forEach(e => {
   keyElements.push(document.querySelector(`#${e}`));
 });
-
 const setValueInKeyInputs = preset => {
   keyElements.forEach((el, i) => {
     el.value = preset[i];
@@ -64,7 +67,7 @@ let code;
 keyElements.forEach((el, i) => {
   el.addEventListener("keydown", e => {
     e.preventDefault();
-    console.log(e.key);
+    console.log(e);
     //only change value when custom is selected
     if (config.preset === "custom") {
       if (!code) {
@@ -149,8 +152,14 @@ elements.lanBtn.addEventListener("click", () => {
 //get and set ip
 elements.ip.innerText = ip.address();
 
+//also generate a qr code with ip and code
+const info = JSON.stringify({ ip: ip.address(), code: config.id });
+qrcode.makeCode(info);
+
+const httpsServer = https.createServer().listen(5976);
+
 //handle connection using web sockets
-const wss = new WebSocket.Server({ port: 5976, maxPayload: 50 });
+const wss = new WebSocket.Server({ server: httpsServer, maxPayload: 50 });
 
 wss.on("connection", (ws, req) => {
   const channel = req.url.slice(1, 7);
@@ -167,8 +176,8 @@ wss.on("connection", (ws, req) => {
 
   ws.on("message", message => {
     console.log(req.url);
-
-    simulateKey(message, config.preset);
+    const keyInfo = JSON.parse(message);
+    simulateKey(keyInfo, config.preset);
     console.log("received: %s", message);
   });
 
