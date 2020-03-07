@@ -3,6 +3,8 @@ const crypto = require("crypto");
 const ip = require("ip");
 const WebSocket = require("ws");
 const robot = require("robotjs");
+const { ipcRenderer } = require("electron");
+
 const https = require("https");
 const remote = require("electron").remote;
 
@@ -126,10 +128,31 @@ elements.saveBtn.addEventListener("click", () => {
   elements.settingsPage.style.display = "none";
 });
 
+
 //when user clicks on setting the settings view
 elements.settingsBtn.addEventListener("click", () => {
+  if (remote.getGlobal("status").isRemoteConnected == true){
   elements.loginPage.style.display = "none";
-  elements.settingsPage.style.display = "flex";
+
+  if (elements.settingsPage.style.display == "flex") {
+    elements.settingsPage.style.display = "none";
+    elements.connectedPage.style.display = "flex";
+  } else {
+    elements.settingsPage.style.display = "flex";
+    elements.connectedPage.style.display = "none";
+  }
+}
+else {
+    elements.connectedPage.style.display = "none";
+    
+    if (elements.settingsPage.style.display == "flex") {
+      elements.settingsPage.style.display = "none";
+      elements.loginPage.style.display = "flex";
+    } else {
+      elements.settingsPage.style.display = "flex";
+      elements.loginPage.style.display = "none";
+    }
+}
 });
 
 //configure the wan and wan button
@@ -154,12 +177,18 @@ const info = JSON.stringify({ ip: ip.address(), code: config.id });
 qrcode.makeCode(info);
 
 //handle connection using web sockets
-const wss = new WebSocket.Server({ port: 5976, maxPayload: 50 });
+const wss = new WebSocket.Server({ port: 8080, maxPayload: 50 });
 
 wss.on("connection", (ws, req) => {
   const channel = req.url.slice(1, 7);
   console.log(channel);
   if (channel === config.id) {
+
+    // send connected notification
+    let myNotification = new Notification('Keymote', {
+      body: 'Remote Connected!'
+    })
+
     //ui update to show the connected screen
     elements.connectedPage.style.display = "flex";
     elements.loginPage.style.display = "none";
@@ -167,6 +196,7 @@ wss.on("connection", (ws, req) => {
 
     //change variable
     remote.getGlobal("status").isRemoteConnected = true;
+
   }
 
   ws.on("message", message => {
@@ -179,9 +209,20 @@ wss.on("connection", (ws, req) => {
   ws.on("close", () => {
     console.log("disconnected");
     remote.getGlobal("status").isRemoteConnected = false;
+    
+    //send disconnect notification
+    let myNotification = new Notification('Keymote', {
+      body: 'Remote Disconnected!'
+    })
+
     //ui update to show the login screen
     elements.connectedPage.style.display = "none";
     elements.loginPage.style.display = "flex";
     elements.statusIndicator.style.display = "flex";
   });
 });
+
+ipcRenderer.on('show-notification', (event, title, body) => {
+  const myNotification = new Notification(title, { body });
+});
+
