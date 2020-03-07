@@ -21,7 +21,7 @@ npm pack
 ```
 
 # Instructions for Setting up Development Enviorment [Windows]
-#Prerequisites
+## Prerequisites
 - Windows 10 / Server 2012 R2 or higher
 - Visual Studio 2017 15.7.2 or higher - download VS 2019 Community Edition for free
 - Python 2.7.10 or higher
@@ -42,7 +42,7 @@ npm install
 yarn
 ```
 If you don't get QR code then try this fix:
-Note: Make sure you are using latest Node.JS version
+*Note: Make sure you are using latest Node.JS version*
 open main folder where index.js exist then open command prompt here.
 ```
 cd node_modules/.bin
