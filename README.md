@@ -41,9 +41,12 @@ npm install
 // or use yarm
 yarn
 ```
-If you don't get QR code then try this fix:
-*Note: Make sure you are using latest Node.JS version*
-open main folder where index.js exist then open command prompt here.
+ If you don't get QR code then try this fix:
+
+ *Note: Make sure you are using latest Node.JS version*
+
+ open main folder where index.js exist then open command prompt here.
+
 ```
 cd node_modules/.bin
 electron-rebuild.cmd --module-dir ../../
