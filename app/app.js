@@ -143,6 +143,8 @@ elements.settingsBtn.addEventListener("click", () => {
   }
 }
 else {
+    elements.connectedPage.style.display = "none";
+    
     if (elements.settingsPage.style.display == "flex") {
       elements.settingsPage.style.display = "none";
       elements.loginPage.style.display = "flex";
@@ -223,3 +225,4 @@ wss.on("connection", (ws, req) => {
 ipcRenderer.on('show-notification', (event, title, body) => {
   const myNotification = new Notification(title, { body });
 });
+
