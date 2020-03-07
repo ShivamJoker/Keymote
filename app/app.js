@@ -5,9 +5,11 @@ const WebSocket = require("ws");
 const robot = require("robotjs");
 const https = require("https");
 
-import "./changeOnWin.js";
+const { getStatus, changeStatus } = require("./status");
+changeStatus(true);
+console.log("remote status", getStatus());
 
-let isRemoteConnected = false;
+import "./changeOnWin.js";
 
 const qrcode = new QRCode("qrcode", { width: 160, height: 160 });
 

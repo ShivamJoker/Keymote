@@ -31,10 +31,20 @@ const createTray = () => {
   // Don't show the app in the mac doc
   if (app.dock) app.dock.hide();
 
-  tray.on("click", function(event) {
-    if (process.platform === "win32") {
+  tray.on("click", event => {
+    const { getStatus } = require("./app/status");
+
+    console.log(getStatus());
+
+    if (!getStatus()) {
+      showWindow();
+      return 0;
+    }
+
+    if (isWindows) {
       tray.on("click", tray.popUpContextMenu);
     }
+
     tray.setContextMenu(
       Menu.buildFromTemplate([
         {
