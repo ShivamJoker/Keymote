@@ -1,6 +1,8 @@
-const { app, BrowserWindow, ipcMain, Tray, win, Menu } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, win, Menu, remote } = require("electron");
+
 const path = require("path");
 const robot = require("robotjs");
+// const remote = require("electron").remote;
 
 let isWindows = false;
 let tray = undefined;
@@ -21,6 +23,8 @@ app.on("ready", () => {
   createWindow();
 });
 
+global.status = { isRemoteConnected: false };
+
 const createTray = () => {
   //if its windows we will use cwd and show an icon
   if (isWindows) {
@@ -33,14 +37,16 @@ const createTray = () => {
   if (app.dock) app.dock.hide();
 
   tray.on("click", event => {
-    const { getStatus } = require("./app/status");
-
-    console.log(getStatus());
-
-    if (!getStatus()) {
-      showWindow();
-      return 0;
-    }
+    console.log(remote)
+    console.log("status: ",global.status.isRemoteConnected)
+  
+  
+    // const isRemoteConnected = global.status.isRemoteConnected;
+    
+    // if (!isRemoteConnected) {
+    //   showWindow(remote.getGlobal("status"));
+    //   // return 0;
+    // }
 
     if (isWindows) {
       tray.on("click", tray.popUpContextMenu);
@@ -109,14 +115,14 @@ const createWindow = () => {
     }
   });
 
-  browserWindow = new BrowserWindow({
-    show: false,
-    webPreferences: {
-      backgroundThrottling: false,
-      nodeIntegration: true
-    }
+  // browserWindow = new BrowserWindow({
+  //   show: false,
+  //   webPreferences: {
+  //     backgroundThrottling: false,
+  //     nodeIntegration: true
+  //   }
     
-  });
+  // });
 
   const position = getWindowPosition();
   window.setPosition(position.x, position.y, false);
@@ -136,10 +142,10 @@ const createWindow = () => {
     )}`
   );
 
-  browserWindow.loadURL(`file://${path.join(
-    isWindows ? process.cwd() : __dirname,
-    "/app/notification.html"
-  )}`);
+  // browserWindow.loadURL(`file://${path.join(
+  //   isWindows ? process.cwd() : __dirname,
+  //   "/app/notification.html"
+  // )}`);
 
   // Hide the window when it loses focus
   window.on("blur", () => {
@@ -147,6 +153,7 @@ const createWindow = () => {
       window.hide();
     }
   });
+
 };
 
 const toggleWindow = () => {
@@ -157,15 +164,14 @@ const showWindow = () => {
   const position = getWindowPosition();
   window.setPosition(position.x, position.y, false);
   window.show();
-  browserWindow.webContents.send(
-    'show-notification',
-    'Keymote',
-    'App is running...'
-  );
+  // window.webContents.send(
+  //   'show-notification',
+  //   'Keymote',
+  //   'App is running...'
+  // );
 };
 
 
 ipcMain.on("show-window", () => {
   showWindow();
 });
-
