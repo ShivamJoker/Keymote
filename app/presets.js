@@ -1,21 +1,22 @@
 const robot = require("robotjs");
 
+
 const simulateMediaKeys = key => {
-  switch (key) {
+  switch (key.key) {
     case "up":
-      robot.keyTap("audio_vol_up");
+      robot.keyToggle("audio_vol_up", key.event);
       break;
     case "left":
-      robot.keyTap("audio_prev");
+      robot.keyToggle("audio_prev", key.event);
       break;
     case "middle":
-      robot.keyTap("audio_play");
+      robot.keyToggle("audio_play", key.event);
       break;
     case "right":
-      robot.keyTap("audio_next");
+      robot.keyToggle("audio_next", key.event);
       break;
     case "down":
-      robot.keyTap("audio_vol_down");
+      robot.keyToggle("audio_vol_down", key.event);
       break;
 
     default:
@@ -24,21 +25,21 @@ const simulateMediaKeys = key => {
 };
 
 const simulateGameKeys = key => {
-  switch (key) {
+  switch (key.key) {
     case "up":
-      robot.keyTap("w");
+      robot.keyToggle("w", key.event);
       break;
     case "left":
-      robot.keyTap("a");
+      robot.keyToggle("a", key.event);
       break;
     case "middle":
-      robot.keyTap("s");
+      robot.keyToggle("s", key.event);
       break;
     case "right":
-      robot.keyTap("d");
+      robot.keyToggle("d", key.event);
       break;
     case "down":
-      robot.keyTap("space");
+      robot.keyToggle("space", key.event);
       break;
     default:
       break;
@@ -46,10 +47,11 @@ const simulateGameKeys = key => {
 };
 
 const simulateArrowKeys = key => {
-  if (key === "middle") {
-    robot.keyTap("enter");
+  console.log(key);
+  if (key.key === "middle") {
+    robot.keyToggle("space", key.event);
   } else {
-    robot.keyTap(key);
+    robot.keyToggle(key.key, key.event);
   }
 };
 
@@ -60,6 +62,11 @@ const simulateKey = (key, preset) => {
       break;
     case "arrow":
       simulateArrowKeys(key);
+      break;
+    case "game":
+      simulateGameKeys(key);
+      break;
+
     default:
       break;
   }
@@ -68,6 +75,6 @@ const simulateKey = (key, preset) => {
 module.exports = {
   mediaKeys: ["Vol Up", "Prv Track", "Play/Pause", "Next Tack", "Vol Down"],
   gameKeys: ["w", "a", "s", "d", "space"],
-  arrowKeys: ["Up", "Left", "Enter", "Right", "Down"],
+  arrowKeys: ["Up", "Left", "Space", "Right", "Down"],
   simulateKey
 };

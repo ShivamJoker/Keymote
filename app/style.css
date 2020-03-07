@@ -8,6 +8,12 @@
   --light-color: #3f51b5;
 }
 
+body {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
 .window {
   background: var(--light-color);
   display: flex;
@@ -46,7 +52,7 @@
   text-align: center;
   display: flex;
   align-items: center;
-  justify-content:center;
+  justify-content: center;
   position: relative;
 }
 .title span {
@@ -111,7 +117,7 @@ input[type="text"] {
   font-size: 15px;
   text-align: center;
   display: inline-block;
-  border: 1px solid #ccc;
+  border: 2px solid #fff;
   background: transparent;
   color: #fff;
   border-radius: 4px;
