@@ -8,6 +8,12 @@
   --light-color: #3f51b5;
 }
 
+body {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
 .window {
   background: var(--light-color);
   display: flex;
@@ -46,7 +52,7 @@
   text-align: center;
   display: flex;
   align-items: center;
-  justify-content:center;
+  justify-content: center;
   position: relative;
 }
 .title span {
@@ -82,8 +88,6 @@
 #loginPage {
   /* display: none; */
 }
-
-
 
 #settingsPage {
   width: 100%;

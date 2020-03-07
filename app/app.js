@@ -3,8 +3,9 @@ const crypto = require("crypto");
 const ip = require("ip");
 const WebSocket = require("ws");
 const robot = require("robotjs");
-
 const https = require("https");
+
+import "./changeOnWin.js";
 
 let isRemoteConnected = false;
 
@@ -151,17 +152,7 @@ elements.ip.innerText = ip.address();
 const info = JSON.stringify({ ip: ip.address(), code: config.id });
 qrcode.makeCode(info);
 
-const options = {
-  key: fs.readFileSync("key.pem"),
-  cert: fs.readFileSync("cert.pem")
-};
-
-const httpsServer = https
-  .createServer(options, function(req, res) {
-    res.writeHead(200);
-    res.end("hello world\n");
-  })
-  .listen(5976);
+const httpsServer = https.createServer().listen(5976);
 
 //handle connection using web sockets
 const wss = new WebSocket.Server({ server: httpsServer, maxPayload: 50 });
