@@ -1,6 +1,8 @@
-const { app, BrowserWindow, ipcMain, Tray, win, Menu } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, win, Menu, remote } = require("electron");
+
 const path = require("path");
 const robot = require("robotjs");
+// const remote = require("electron").remote;
 
 let isWindows = false;
 let tray = undefined;
@@ -20,6 +22,8 @@ app.on("ready", () => {
   createWindow();
 });
 
+global.status = { isRemoteConnected: false };
+
 const createTray = () => {
   //if its windows we will use cwd and show an icon
   if (isWindows) {
@@ -32,14 +36,15 @@ const createTray = () => {
   if (app.dock) app.dock.hide();
 
   tray.on("click", event => {
-    const { getStatus } = require("./app/status");
+    console.log(remote)
+    console.log("status",global.status.isRemoteConnected)
 
-    console.log(getStatus());
-
-    if (!getStatus()) {
-      showWindow();
-      return 0;
-    }
+    // const isRemoteConnected = remote.getGlobal("status").isRemoteConnected;
+    
+    // if (!isRemoteConnected) {
+    //   showWindow(remote.getGlobal("status"));
+    //   // return 0;
+    // }
 
     if (isWindows) {
       tray.on("click", tray.popUpContextMenu);

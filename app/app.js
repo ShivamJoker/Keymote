@@ -4,10 +4,9 @@ const ip = require("ip");
 const WebSocket = require("ws");
 const robot = require("robotjs");
 const https = require("https");
+const remote = require("electron").remote;
 
-const { getStatus, changeStatus } = require("./status");
-changeStatus(true);
-console.log("remote status", getStatus());
+console.log(remote.getGlobal("status").isRemoteConnected);
 
 import "./changeOnWin.js";
 
@@ -17,7 +16,7 @@ const qrcode = new QRCode("qrcode", { width: 160, height: 160 });
 const randbytes = parseInt(crypto.randomBytes(3).toString("hex"), 16);
 const uniquieId = randbytes.toString().slice(0, 6);
 
-//array of ids which we are gonna select
+//array of ids which we are gonna selectj
 const { mediaKeys, gameKeys, arrowKeys, simulateKey } = require("./presets");
 const filePath = "config.json";
 
@@ -154,10 +153,8 @@ elements.ip.innerText = ip.address();
 const info = JSON.stringify({ ip: ip.address(), code: config.id });
 qrcode.makeCode(info);
 
-const httpsServer = https.createServer().listen(5976);
-
 //handle connection using web sockets
-const wss = new WebSocket.Server({ server: httpsServer, maxPayload: 50 });
+const wss = new WebSocket.Server({ port: 5976, maxPayload: 50 });
 
 wss.on("connection", (ws, req) => {
   const channel = req.url.slice(1, 7);
@@ -169,7 +166,7 @@ wss.on("connection", (ws, req) => {
     elements.statusIndicator.style.display = "none";
 
     //change variable
-    isRemoteConnected = true;
+    remote.getGlobal("status").isRemoteConnected = true;
   }
 
   ws.on("message", message => {
@@ -181,7 +178,7 @@ wss.on("connection", (ws, req) => {
 
   ws.on("close", () => {
     console.log("disconnected");
-    isRemoteConnected = false;
+    remote.getGlobal("status").isRemoteConnected = false;
     //ui update to show the login screen
     elements.connectedPage.style.display = "none";
     elements.loginPage.style.display = "flex";
