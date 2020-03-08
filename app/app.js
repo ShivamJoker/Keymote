@@ -5,7 +5,7 @@ const ip = require("ip");
 const WebSocket = require("ws");
 const robot = require("robotjs");
 const { ipcRenderer } = require("electron");
-
+const http = require('http');
 const https = require("https");
 const remote = require("electron").remote;
 
@@ -180,8 +180,65 @@ qrcode.makeCode(info);
 //handle connection using web sockets
 // const wss = new WebSocket.Server({ port: 7698, maxPayload: 50 });
 
-// const wss = new WebSocket(`wss://keymote.creativeshi.com/ws/${config.id}`);
+const wss = new WebSocket.Server({ port: 7698, maxPayload: 50 });
 
+wss.on('connection', ws => {
+  ws.room = [];
+  ws.send(JSON.stringify({ msg: "user joined" }));
+  console.log('connected');
+  // send connected notification
+  let myNotification = new Notification('Keymote', {
+    body: 'Remote Connected!'
+  })
+
+  //ui update to show the connected screen
+  elements.connectedPage.style.display = "flex";
+  elements.loginPage.style.display = "none";
+  elements.statusIndicator.style.display = "none";
+
+  //change variable
+  remote.getGlobal("status").isRemoteConnected = true;
+
+  ws.on('message', message => {
+    console.log('message: ', message);
+    
+    // try{
+    var messag = JSON.parse(message);
+    // }catch(e){console.log(e)}
+    if (messag.join) { ws.room.push(messag.join) }
+    if (messag.room) { broadcast(message); }
+    if (messag.msg) { console.log('message: ', messag.msg)
+      const keyInfo = JSON.parse(message);
+      simulateKey(keyInfo, config.preset);
+  }
+  })
+
+  ws.on('error', e => console.log(e))
+
+  ws.on('close', (e) => {
+    console.log("disconnected");
+    remote.getGlobal("status").isRemoteConnected = false;
+
+    //send disconnect notification
+    let myNotification = new Notification('Keymote', {
+      body: 'Remote Disconnected!'
+    })
+
+    //ui update to show the login screen
+    elements.connectedPage.style.display = "none";
+    elements.loginPage.style.display = "flex";
+    elements.statusIndicator.style.display = "flex";
+  })
+
+})
+
+function broadcast(message) {
+  wss.clients.forEach(client => {
+    if (client.room.indexOf(JSON.parse(message).room) > -1) {
+      client.send(message)
+    }
+  })
+}
 // console.log("reached here");
 
 // wss.on("connection", (wss, req) => {
@@ -189,10 +246,10 @@ qrcode.makeCode(info);
 //   console.log(channel);
 //   if (channel === config.id) {
 
-//     // send connected notification
-//     let myNotification = new Notification('Keymote', {
-//       body: 'Remote Connected!'
-//     })
+    // // send connected notification
+    // let myNotification = new Notification('Keymote', {
+    //   body: 'Remote Connected!'
+    // })
 
     // //ui update to show the connected screen
     // elements.connectedPage.style.display = "flex";
@@ -206,24 +263,24 @@ qrcode.makeCode(info);
 
 //   ws.on("message", message => {
 //     console.log(req.url);
-//     const keyInfo = JSON.parse(message);
-//     simulateKey(keyInfo, config.preset);
+    // const keyInfo = JSON.parse(message);
+    // simulateKey(keyInfo, config.preset);
 //     console.log("received: %s", message);
 //   });
 
 //   ws.on("close", () => {
-//     console.log("disconnected");
-//     remote.getGlobal("status").isRemoteConnected = false;
+    // console.log("disconnected");
+    // remote.getGlobal("status").isRemoteConnected = false;
     
-//     //send disconnect notification
-//     let myNotification = new Notification('Keymote', {
-//       body: 'Remote Disconnected!'
-//     })
+    // //send disconnect notification
+    // let myNotification = new Notification('Keymote', {
+    //   body: 'Remote Disconnected!'
+    // })
 
-//     //ui update to show the login screen
-//     elements.connectedPage.style.display = "none";
-//     elements.loginPage.style.display = "flex";
-//     elements.statusIndicator.style.display = "flex";
+    // //ui update to show the login screen
+    // elements.connectedPage.style.display = "none";
+    // elements.loginPage.style.display = "flex";
+    // elements.statusIndicator.style.display = "flex";
 //   });
 // });
 
@@ -268,7 +325,7 @@ const connectToServer = info => {
   };
 };
 
-connectToServer();
+// connectToServer();
 
 ipcRenderer.on('show-notification', (event, title, body) => {
   const myNotification = new Notification(title, { body });
