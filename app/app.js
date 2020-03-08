@@ -154,7 +154,7 @@ const info = JSON.stringify({ ip: ip.address(), code: config.id });
 qrcode.makeCode(info);
 
 //handle connection using web sockets
-const wss = new WebSocket.Server({ port: 5976, maxPayload: 50 });
+const wss = new WebSocket.Server({ port: 7689, maxPayload: 50 });
 
 wss.on("connection", (ws, req) => {
   const channel = req.url.slice(1, 7);
