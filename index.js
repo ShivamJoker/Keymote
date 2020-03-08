@@ -8,6 +8,7 @@ let isWindows = false;
 let tray = undefined;
 let window = undefined;
 let isQuiting = undefined;
+let browserWindow = undefined;
 
 if (process.platform === "win32") {
   isWindows = true;
@@ -37,9 +38,10 @@ const createTray = () => {
 
   tray.on("click", event => {
     console.log(remote)
-    console.log("status",global.status.isRemoteConnected)
-
-    // const isRemoteConnected = remote.getGlobal("status").isRemoteConnected;
+    console.log("status: ",global.status.isRemoteConnected)
+  
+  
+    // const isRemoteConnected = global.status.isRemoteConnected;
     
     // if (!isRemoteConnected) {
     //   showWindow(remote.getGlobal("status"));
@@ -113,6 +115,15 @@ const createWindow = () => {
     }
   });
 
+  // browserWindow = new BrowserWindow({
+  //   show: false,
+  //   webPreferences: {
+  //     backgroundThrottling: false,
+  //     nodeIntegration: true
+  //   }
+    
+  // });
+
   const position = getWindowPosition();
   window.setPosition(position.x, position.y, false);
 
@@ -131,12 +142,18 @@ const createWindow = () => {
     )}`
   );
 
+  // browserWindow.loadURL(`file://${path.join(
+  //   isWindows ? process.cwd() : __dirname,
+  //   "/app/notification.html"
+  // )}`);
+
   // Hide the window when it loses focus
   window.on("blur", () => {
     if (!window.webContents.isDevToolsOpened()) {
       window.hide();
     }
   });
+
 };
 
 const toggleWindow = () => {
@@ -147,7 +164,13 @@ const showWindow = () => {
   const position = getWindowPosition();
   window.setPosition(position.x, position.y, false);
   window.show();
+  // window.webContents.send(
+  //   'show-notification',
+  //   'Keymote',
+  //   'App is running...'
+  // );
 };
+
 
 ipcMain.on("show-window", () => {
   showWindow();
