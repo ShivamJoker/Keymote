@@ -177,18 +177,62 @@ const info = JSON.stringify({ ip: ip.address(), code: config.id });
 qrcode.makeCode(info);
 
 //handle connection using web sockets
-const wss = new WebSocket.Server({ port: 8080, maxPayload: 50 });
+// const wss = new WebSocket.Server({ port: 7698, maxPayload: 50 });
 
-wss.on("connection", (ws, req) => {
-  const channel = req.url.slice(1, 7);
-  console.log(channel);
-  if (channel === config.id) {
+// const wss = new WebSocket(`wss://keymote.creativeshi.com/ws/${config.id}`);
 
-    // send connected notification
-    let myNotification = new Notification('Keymote', {
-      body: 'Remote Connected!'
-    })
+// console.log("reached here");
 
+// wss.on("connection", (wss, req) => {
+//   const channel = req.url;
+//   console.log(channel);
+//   if (channel === config.id) {
+
+//     // send connected notification
+//     let myNotification = new Notification('Keymote', {
+//       body: 'Remote Connected!'
+//     })
+
+    // //ui update to show the connected screen
+    // elements.connectedPage.style.display = "flex";
+    // elements.loginPage.style.display = "none";
+    // elements.statusIndicator.style.display = "none";
+
+    // //change variable
+    // remote.getGlobal("status").isRemoteConnected = true;
+
+//   }
+
+//   ws.on("message", message => {
+//     console.log(req.url);
+//     const keyInfo = JSON.parse(message);
+//     simulateKey(keyInfo, config.preset);
+//     console.log("received: %s", message);
+//   });
+
+//   ws.on("close", () => {
+//     console.log("disconnected");
+//     remote.getGlobal("status").isRemoteConnected = false;
+    
+//     //send disconnect notification
+//     let myNotification = new Notification('Keymote', {
+//       body: 'Remote Disconnected!'
+//     })
+
+//     //ui update to show the login screen
+//     elements.connectedPage.style.display = "none";
+//     elements.loginPage.style.display = "flex";
+//     elements.statusIndicator.style.display = "flex";
+//   });
+// });
+
+let ws;
+
+const connectToServer = info => {
+
+  ws = new WebSocket(`wss://keymote.creativeshi.com/ws/${config.id}`);
+
+  ws.onopen = e => {
     //ui update to show the connected screen
     elements.connectedPage.style.display = "flex";
     elements.loginPage.style.display = "none";
@@ -196,33 +240,37 @@ wss.on("connection", (ws, req) => {
 
     //change variable
     remote.getGlobal("status").isRemoteConnected = true;
+  };
 
-  }
+  ws.onclose = e => {
+    console.log(
+      "Socket is closed. Reconnect will be attempted in 1 second.",
+      e.reason
+    );
+    if (wasSocketConnected) {
+      setTimeout(() => {
+        connectToServer();
+      }, 1000);
+    }
+  };
 
-  ws.on("message", message => {
+  ws.onerror = err => {
+    console.error("Socket encountered error: ", err.message, "Closing socket");
+    ws.close();
+  };
+
+  ws.onmessage = e => {
     console.log(req.url);
-    const keyInfo = JSON.parse(message);
+    const keyInfo = JSON.parse(e.data);
     simulateKey(keyInfo, config.preset);
-    console.log("received: %s", message);
-  });
+    console.log("received: %s", e.data);
+  };
+};
 
-  ws.on("close", () => {
-    console.log("disconnected");
-    remote.getGlobal("status").isRemoteConnected = false;
-    
-    //send disconnect notification
-    let myNotification = new Notification('Keymote', {
-      body: 'Remote Disconnected!'
-    })
-
-    //ui update to show the login screen
-    elements.connectedPage.style.display = "none";
-    elements.loginPage.style.display = "flex";
-    elements.statusIndicator.style.display = "flex";
-  });
-});
+connectToServer();
 
 ipcRenderer.on('show-notification', (event, title, body) => {
   const myNotification = new Notification(title, { body });
 });
 
+// wscat -c ws://192.168.31.84:8080/350335
