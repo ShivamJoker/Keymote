@@ -107,7 +107,7 @@ const createWindow = () => {
     show: true,
     frame: false,
     fullscreenable: true,
-    resizable: false,
+    resizable: true,
     transparent: true,
     webPreferences: {
       backgroundThrottling: false,

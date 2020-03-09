@@ -1,8 +1,7 @@
-
 const fs = require("fs");
 const crypto = require("crypto");
 const ip = require("ip");
-const WebSocket = require("ws");
+// const WebSocket = require("ws");
 const robot = require("robotjs");
 const { ipcRenderer } = require("electron");
 
@@ -129,23 +128,21 @@ elements.saveBtn.addEventListener("click", () => {
   elements.settingsPage.style.display = "none";
 });
 
-
 //when user clicks on setting the settings view
 elements.settingsBtn.addEventListener("click", () => {
-  if (remote.getGlobal("status").isRemoteConnected == true){
-  elements.loginPage.style.display = "none";
+  if (remote.getGlobal("status").isRemoteConnected == true) {
+    elements.loginPage.style.display = "none";
 
-  if (elements.settingsPage.style.display == "flex") {
-    elements.settingsPage.style.display = "none";
-    elements.connectedPage.style.display = "flex";
+    if (elements.settingsPage.style.display == "flex") {
+      elements.settingsPage.style.display = "none";
+      elements.connectedPage.style.display = "flex";
+    } else {
+      elements.settingsPage.style.display = "flex";
+      elements.connectedPage.style.display = "none";
+    }
   } else {
-    elements.settingsPage.style.display = "flex";
     elements.connectedPage.style.display = "none";
-  }
-}
-else {
-    elements.connectedPage.style.display = "none";
-    
+
     if (elements.settingsPage.style.display == "flex") {
       elements.settingsPage.style.display = "none";
       elements.loginPage.style.display = "flex";
@@ -153,7 +150,7 @@ else {
       elements.settingsPage.style.display = "flex";
       elements.loginPage.style.display = "none";
     }
-}
+  }
 });
 
 //configure the wan and wan button
@@ -194,13 +191,13 @@ qrcode.makeCode(info);
 //       body: 'Remote Connected!'
 //     })
 
-    // //ui update to show the connected screen
-    // elements.connectedPage.style.display = "flex";
-    // elements.loginPage.style.display = "none";
-    // elements.statusIndicator.style.display = "none";
+// //ui update to show the connected screen
+// elements.connectedPage.style.display = "flex";
+// elements.loginPage.style.display = "none";
+// elements.statusIndicator.style.display = "none";
 
-    // //change variable
-    // remote.getGlobal("status").isRemoteConnected = true;
+// //change variable
+// remote.getGlobal("status").isRemoteConnected = true;
 
 //   }
 
@@ -214,7 +211,7 @@ qrcode.makeCode(info);
 //   ws.on("close", () => {
 //     console.log("disconnected");
 //     remote.getGlobal("status").isRemoteConnected = false;
-    
+
 //     //send disconnect notification
 //     let myNotification = new Notification('Keymote', {
 //       body: 'Remote Disconnected!'
@@ -229,18 +226,15 @@ qrcode.makeCode(info);
 
 let ws;
 
-const connectToServer = info => {
+let wasSocketConnected = false;
 
-  ws = new WebSocket(`wss://keymote.creativeshi.com/ws/${config.id}`);
+const connectToServer = info => {
+  ws = new WebSocket(`wss://keymote.creativeshi.com/ws/`);
 
   ws.onopen = e => {
-    //ui update to show the connected screen
-    elements.connectedPage.style.display = "flex";
-    elements.loginPage.style.display = "none";
-    elements.statusIndicator.style.display = "none";
-
     //change variable
     remote.getGlobal("status").isRemoteConnected = true;
+    wasSocketConnected = true;
   };
 
   ws.onclose = e => {
@@ -261,16 +255,22 @@ const connectToServer = info => {
   };
 
   ws.onmessage = e => {
-    console.log(req.url);
-    const keyInfo = JSON.parse(e.data);
-    simulateKey(keyInfo, config.preset);
-    console.log("received: %s", e.data);
+    //ui update to show the connected screen
+    elements.connectedPage.style.display = "flex";
+    elements.loginPage.style.display = "none";
+    elements.statusIndicator.style.display = "none";
+    // console.log(req.url);
+
+    console.log(e);
+    // const keyInfo = JSON.parse(e.data);
+    // simulateKey(keyInfo, config.preset);
+    // console.log("received: %s", e.data);
   };
 };
 
 connectToServer();
 
-ipcRenderer.on('show-notification', (event, title, body) => {
+ipcRenderer.on("show-notification", (event, title, body) => {
   const myNotification = new Notification(title, { body });
 });
 
