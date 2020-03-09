@@ -4,7 +4,7 @@ const ip = require("ip");
 // const WebSocket = require("ws");
 const robot = require("robotjs");
 const { ipcRenderer } = require("electron");
-
+const http = require("http");
 const https = require("https");
 const remote = require("electron").remote;
 
@@ -174,67 +174,82 @@ elements.ip.innerText = ip.address();
 const info = JSON.stringify({ ip: ip.address(), code: config.id });
 qrcode.makeCode(info);
 
+let ws;
+
+
+const showConnectedPage = ()=>{
+  elements.connectedPage.style.display = "flex";
+  elements.loginPage.style.display = "none";
+  elements.statusIndicator.style.display = "none";
+}
+
 //handle connection using web sockets
 // const wss = new WebSocket.Server({ port: 7698, maxPayload: 50 });
 
-// const wss = new WebSocket(`wss://keymote.creativeshi.com/ws/${config.id}`);
+function lanServer() {
+  const wss = new WebSocket.Server({ port: 7698, maxPayload: 50 });
 
-// console.log("reached here");
+  wss.on("connection", ws => {
+    ws.room = [];
+    ws.send(JSON.stringify({ msg: "user joined" }));
+    console.log("connected");
+    // send connected notification
+    let myNotification = new Notification("Keymote", {
+      body: "Remote Connected!"
+    });
 
-// wss.on("connection", (wss, req) => {
-//   const channel = req.url;
-//   console.log(channel);
-//   if (channel === config.id) {
 
-//     // send connected notification
-//     let myNotification = new Notification('Keymote', {
-//       body: 'Remote Connected!'
-//     })
-
-// //ui update to show the connected screen
-// elements.connectedPage.style.display = "flex";
-// elements.loginPage.style.display = "none";
-// elements.statusIndicator.style.display = "none";
-
-// //change variable
-// remote.getGlobal("status").isRemoteConnected = true;
-
-//   }
-
-//   ws.on("message", message => {
-//     console.log(req.url);
-//     const keyInfo = JSON.parse(message);
-//     simulateKey(keyInfo, config.preset);
-//     console.log("received: %s", message);
-//   });
-
-//   ws.on("close", () => {
-//     console.log("disconnected");
-//     remote.getGlobal("status").isRemoteConnected = false;
-
-//     //send disconnect notification
-//     let myNotification = new Notification('Keymote', {
-//       body: 'Remote Disconnected!'
-//     })
-
-//     //ui update to show the login screen
-//     elements.connectedPage.style.display = "none";
-//     elements.loginPage.style.display = "flex";
-//     elements.statusIndicator.style.display = "flex";
-//   });
-// });
-
-let ws;
-
-let wasSocketConnected = false;
-
-const connectToServer = info => {
-  ws = new WebSocket(`wss://keymote.creativeshi.com/ws/`);
-
-  ws.onopen = e => {
     //change variable
     remote.getGlobal("status").isRemoteConnected = true;
+
+    ws.on("message", message => {
+      
+      const keyInfo = JSON.parse(message);
+      simulateKey(keyInfo, config.preset);
+    });
+
+    ws.on("error", e => console.log(e));
+
+    ws.on("close", e => {
+      console.log("disconnected");
+      remote.getGlobal("status").isRemoteConnected = false;
+
+      //send disconnect notification
+      let myNotification = new Notification("Keymote", {
+        body: "Remote Disconnected!"
+      });
+
+      //ui update to show the login screen
+      elements.connectedPage.style.display = "none";
+      elements.loginPage.style.display = "flex";
+      elements.statusIndicator.style.display = "flex";
+    });
+  });
+
+  function broadcast(message) {
+    wss.clients.forEach(client => {
+      if (client.room.indexOf(JSON.parse(message).room) > -1) {
+        client.send(message);
+        console.log("message brodcasted");
+      }
+    });
+  }
+}
+
+// lanServer();
+
+let wasSocketConnected = false;
+const connectToServer = info => {
+  ws = new WebSocket(`wss://keymote.creativeshi.com/ws/${config.id}`);
+
+  ws.onopen = e => {
     wasSocketConnected = true;
+    //change variable
+    remote.getGlobal("status").isRemoteConnected = true;
+    showConnectedPage()
+    // new Notification("Keymote", {
+    //   body: "Remote Connected!"
+    // });
   };
 
   ws.onclose = e => {
@@ -255,16 +270,9 @@ const connectToServer = info => {
   };
 
   ws.onmessage = e => {
-    //ui update to show the connected screen
-    elements.connectedPage.style.display = "flex";
-    elements.loginPage.style.display = "none";
-    elements.statusIndicator.style.display = "none";
-    // console.log(req.url);
-
-    console.log(e);
-    // const keyInfo = JSON.parse(e.data);
-    // simulateKey(keyInfo, config.preset);
-    // console.log("received: %s", e.data);
+    const keyInfo = JSON.parse(e.data);
+    simulateKey(keyInfo, config.preset);
+    console.log("received: %s", e.data);
   };
 };
 
