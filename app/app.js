@@ -176,12 +176,19 @@ qrcode.makeCode(info);
 
 let ws;
 
-
-const showConnectedPage = ()=>{
+// show connected page
+const showConnectedPage = () => {
   elements.connectedPage.style.display = "flex";
   elements.loginPage.style.display = "none";
   elements.statusIndicator.style.display = "none";
-}
+};
+
+const showLoginPage = () => {
+  //ui update to show the qr login screen
+  elements.connectedPage.style.display = "none";
+  elements.loginPage.style.display = "flex";
+  elements.statusIndicator.style.display = "flex";
+};
 
 //handle connection using web sockets
 // const wss = new WebSocket.Server({ port: 7698, maxPayload: 50 });
@@ -198,12 +205,10 @@ function lanServer() {
       body: "Remote Connected!"
     });
 
-
     //change variable
     remote.getGlobal("status").isRemoteConnected = true;
 
     ws.on("message", message => {
-      
       const keyInfo = JSON.parse(message);
       simulateKey(keyInfo, config.preset);
     });
@@ -245,8 +250,6 @@ const connectToServer = info => {
   ws.onopen = e => {
     wasSocketConnected = true;
     //change variable
-    remote.getGlobal("status").isRemoteConnected = true;
-    showConnectedPage()
     // new Notification("Keymote", {
     //   body: "Remote Connected!"
     // });
@@ -270,9 +273,22 @@ const connectToServer = info => {
   };
 
   ws.onmessage = e => {
-    const keyInfo = JSON.parse(e.data);
-    simulateKey(keyInfo, config.preset);
-    console.log("received: %s", e.data);
+    console.log(e);
+    const res = JSON.parse(e.data);
+    const clientsNo = res.connected_clients;
+    if (clientsNo) {
+      // if there are more than one client it means we all are connected
+      if (clientsNo > 1) {
+        showConnectedPage();
+        remote.getGlobal("status").isRemoteConnected = true;
+      } else {
+        showLoginPage();
+        remote.getGlobal("status").isRemoteConnected = false;
+      }
+    } else {
+      simulateKey(res, config.preset);
+    }
+    // console.log("received: %s", e.data);
   };
 };
 
