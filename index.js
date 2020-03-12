@@ -1,4 +1,12 @@
-const { app, BrowserWindow, ipcMain, Tray, win, Menu, remote } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Tray,
+  win,
+  Menu,
+  remote
+} = require("electron");
 
 const path = require("path");
 const robot = require("robotjs");
@@ -28,21 +36,20 @@ global.status = { isRemoteConnected: false };
 const createTray = () => {
   //if its windows we will use cwd and show an icon
   if (isWindows) {
-    tray = new Tray(path.join(process.cwd(), "/icons/iconTemplate.png"));
+    tray = new Tray(path.join(process.cwd(), "build/icon.png"));
   } else {
-    tray = new Tray(path.join(__dirname, "/icons/iconTemplate.png"));
+    tray = new Tray(path.join(__dirname, "build/icons/iconTemplate.png"));
   }
 
   // Don't show the app in the mac doc
   if (app.dock) app.dock.hide();
 
   tray.on("click", event => {
-    console.log(remote)
-    console.log("status: ",global.status.isRemoteConnected)
-  
-  
+    console.log(remote);
+    console.log("status: ", global.status.isRemoteConnected);
+
     // const isRemoteConnected = global.status.isRemoteConnected;
-    
+
     // if (!isRemoteConnected) {
     //   showWindow(remote.getGlobal("status"));
     //   // return 0;
@@ -122,7 +129,7 @@ const createWindow = () => {
   //     backgroundThrottling: false,
   //     nodeIntegration: true
   //   }
-    
+
   // });
 
   const position = getWindowPosition();
@@ -154,7 +161,6 @@ const createWindow = () => {
       window.hide();
     }
   });
-
 };
 
 const toggleWindow = () => {
@@ -171,7 +177,6 @@ const showWindow = () => {
   //   'App is running...'
   // );
 };
-
 
 ipcMain.on("show-window", () => {
   showWindow();

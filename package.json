@@ -1,6 +1,6 @@
 {
   "name": "Keymote",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Control your keyboard easily from anywhere in the world",
   "main": "index.js",
   "scripts": {
@@ -27,20 +27,31 @@
     "appId": "com.keymote",
     "productName": "Keymote",
     "asar": true,
+    "asarUnpack": [
+      "**/*.node"
+    ],
+
     "copyright": "Ⓒ2020 CreativeJE",
     "dmg": {
+      "icon": "build/icon.icns",
+      "iconSize": 100,
       "contents": [
         {
-          "x": 110,
-          "y": 150
-        },
-        {
-          "x": 240,
-          "y": 150,
+          "x": 380,
+          "y": 220,
           "type": "link",
           "path": "/Applications"
+        },
+        {
+          "x": 110,
+          "y": 220,
+          "type": "file"
         }
-      ]
+      ],
+      "window": {
+        "width": 500,
+        "height": 350
+      }
     },
     "linux": {
       "target": [
@@ -50,7 +61,7 @@
     },
     "win": {
       "target": "squirrel",
-      "icon": "icons/icon.png"
+      "icon": "build/icon.png"
     },
     "mac": {
       "category": "public.app-category.utilities"
