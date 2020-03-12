@@ -26,11 +26,7 @@
   "build": {
     "appId": "com.keymote",
     "productName": "Keymote",
-    "asar": true,
-    "asarUnpack": [
-      "**/*.node"
-    ],
-
+    "files": ["**/*", "build/**/**"],
     "copyright": "Ⓒ2020 CreativeJE",
     "dmg": {
       "icon": "build/icon.icns",
