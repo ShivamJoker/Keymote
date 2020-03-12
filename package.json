@@ -1,7 +1,7 @@
 {
   "name": "Keymote",
   "version": "1.0.0",
-  "description": "",
+  "description": "Control your keyboard easily from anywhere in the world",
   "main": "index.js",
   "scripts": {
     "pack": "electron-builder --dir",
@@ -10,7 +10,7 @@
     "start": "electron ."
   },
   "keywords": [],
-  "author": "",
+  "author": "Shivam",
   "license": "ISC",
   "devDependencies": {
     "asar": "^2.1.0",
@@ -25,6 +25,33 @@
   },
   "build": {
     "appId": "com.keymote",
+    "productName": "Keymote",
+    "asar": true,
+    "copyright": "Ⓒ2020 CreativeJE",
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "squirrel",
+      "icon": "icons/icon.png"
+    },
     "mac": {
       "category": "public.app-category.utilities"
     }
