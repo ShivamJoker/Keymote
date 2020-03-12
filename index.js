@@ -22,7 +22,7 @@ if (process.platform === "win32") {
   isWindows = true;
 }
 
-app.on("before-quit", function() {
+app.on("before-quit", function () {
   isQuiting = true;
 });
 
@@ -35,8 +35,9 @@ global.status = { isRemoteConnected: false };
 
 const createTray = () => {
   //if its windows we will use cwd and show an icon
+  const iconPath = path.join(__dirname, "build/icon.ico")
   if (isWindows) {
-    tray = new Tray(path.join(process.cwd(), "build/icon.png"));
+    tray = new Tray(iconPath);
   } else {
     tray = new Tray(path.join(__dirname, "build/icons/iconTemplate.png"));
   }
@@ -63,13 +64,13 @@ const createTray = () => {
       Menu.buildFromTemplate([
         {
           label: "Show App",
-          click: function() {
+          click: function () {
             showWindow();
           }
         },
         {
           label: "Quit",
-          click: function() {
+          click: function () {
             isQuiting = true;
             app.quit();
           }
@@ -135,7 +136,7 @@ const createWindow = () => {
   const position = getWindowPosition();
   window.setPosition(position.x, position.y, false);
 
-  window.on("close", function(event) {
+  window.on("close", function (event) {
     if (!isQuiting) {
       event.preventDefault();
       window.hide();
@@ -145,7 +146,7 @@ const createWindow = () => {
 
   window.loadURL(
     `file://${path.join(
-      isWindows ? process.cwd() : __dirname,
+      __dirname,
       "/app/index.html"
     )}`
   );

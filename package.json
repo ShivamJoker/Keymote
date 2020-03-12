@@ -26,7 +26,15 @@
   "build": {
     "appId": "com.keymote",
     "productName": "Keymote",
-    "files": ["**/*", "build/**/**"],
+    "files": [
+      "**/*",
+      "build/**/**",
+      "app/**"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "../node_modules/uws"
+    ],
     "copyright": "Ⓒ2020 CreativeJE",
     "dmg": {
       "icon": "build/icon.icns",
@@ -56,8 +64,15 @@
       ]
     },
     "win": {
-      "target": "squirrel",
-      "icon": "build/icon.png"
+      "target": "nsis",
+      "icon": "build/icon.ico",
+      "artifactName": "${productName}-${version}.${ext}",
+      "publisherName": "CreativeJE"
+    },
+    "nsis": {
+      "allowToChangeInstallationDirectory": true,
+      "oneClick": false,
+      "perMachine": false
     },
     "mac": {
       "category": "public.app-category.utilities"
