@@ -104,6 +104,7 @@ const createWindow = () => {
     height: 430,
     // width: 1000,
     // height: 750,
+    skipTaskbar: true,
     show: true,
     frame: false,
     fullscreenable: true,

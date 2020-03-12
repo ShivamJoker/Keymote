@@ -1,5 +1,5 @@
 {
-  "name": "remote-control-electron",
+  "name": "Keymote",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -16,20 +16,17 @@
     "asar": "^2.1.0",
     "electron": "^8.0.2",
     "electron-builder": "^22.3.2",
-    "electron-packager": "^14.2.1",
     "electron-rebuild": "^1.10.0"
   },
   "dependencies": {
-    "bonjour": "^3.5.0",
-    "electron-reload": "^1.5.0",
     "ip": "^1.1.5",
     "robotjs": "^0.6.0",
     "ws": "^7.2.1"
   },
   "build": {
-    "appId": "your.id",
+    "appId": "com.keymote",
     "mac": {
-      "category": "your.app.category.type"
+      "category": "public.app-category.utilities"
     }
   }
 }
