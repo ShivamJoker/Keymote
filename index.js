@@ -9,7 +9,6 @@ const {
 } = require("electron");
 
 const path = require("path");
-const robot = require("robotjs");
 // const remote = require("electron").remote;
 
 let isWindows = false;
@@ -22,7 +21,7 @@ if (process.platform === "win32") {
   isWindows = true;
 }
 
-app.on("before-quit", function () {
+app.on("before-quit", function() {
   isQuiting = true;
 });
 
@@ -35,7 +34,7 @@ global.status = { isRemoteConnected: false };
 
 const createTray = () => {
   //if its windows we will use cwd and show an icon
-  const iconPath = path.join(__dirname, "build/icon.ico")
+  const iconPath = path.join(__dirname, "build/icon.ico");
   if (isWindows) {
     tray = new Tray(iconPath);
   } else {
@@ -45,38 +44,44 @@ const createTray = () => {
   // Don't show the app in the mac doc
   if (app.dock) app.dock.hide();
 
-  tray.on("click", event => {
+  tray.on("click", () => {
+    toggleWindow();
+  });
+
+  tray.on("right-click", event => {
     console.log(remote);
     console.log("status: ", global.status.isRemoteConnected);
 
-    // const isRemoteConnected = global.status.isRemoteConnected;
+    const isRemoteConnected = global.status.isRemoteConnected;
 
-    // if (!isRemoteConnected) {
-    //   showWindow(remote.getGlobal("status"));
-    //   // return 0;
-    // }
-
-    if (isWindows) {
-      tray.on("click", tray.popUpContextMenu);
-    }
-
-    tray.setContextMenu(
+    // showWindow(remote.getGlobal("status"));
+    // return 0;
+    tray.popUpContextMenu(
       Menu.buildFromTemplate([
         {
+          label: `Status: ${isRemoteConnected ? "Connected": "Not Connected"}`,
+          enabled: false
+        },
+        {type:'separator'},
+        {
           label: "Show App",
-          click: function () {
+          click: () => {
             showWindow();
           }
         },
         {
           label: "Quit",
-          click: function () {
+          click: () => {
             isQuiting = true;
             app.quit();
           }
         }
       ])
     );
+
+    // if (isWindows) {
+    //   tray.on("click", tray.popUpContextMenu);
+    // }
   });
 
   tray.setToolTip("Keymote");
@@ -136,7 +141,7 @@ const createWindow = () => {
   const position = getWindowPosition();
   window.setPosition(position.x, position.y, false);
 
-  window.on("close", function (event) {
+  window.on("close", function(event) {
     if (!isQuiting) {
       event.preventDefault();
       window.hide();
@@ -144,12 +149,7 @@ const createWindow = () => {
     }
   });
 
-  window.loadURL(
-    `file://${path.join(
-      __dirname,
-      "/app/index.html"
-    )}`
-  );
+  window.loadURL(`file://${path.join(__dirname, "/app/index.html")}`);
 
   // browserWindow.loadURL(`file://${path.join(
   //   isWindows ? process.cwd() : __dirname,
