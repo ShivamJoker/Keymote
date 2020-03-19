@@ -62,23 +62,51 @@ const changePreset = preset => {
   }
 };
 
+let customKeys = {
+  up: { general: [], modifier: [] },
+  left: { general: [], modifier: [] },
+  middle: { general: [], modifier: [] },
+  right: { general: [], modifier: [] },
+  down: { general: [], modifier: [] }
+};
+//add event listener on custom input boxes
 let code;
 keyElements.forEach((el, i) => {
+  console.log(el.id);
   el.addEventListener("keydown", e => {
     e.preventDefault();
     console.log(e);
+    let key = e.key;
     //only change value when custom is selected
+
     if (config.preset === "custom") {
-      if (!code) {
-        code = e.key;
+      //push it intro the array
+      //if its a meta key it means its control in mac
+      if (key === "Meta") {
+        key = "command";
+      }
+      console.log(customKeys);
+
+      //if its modifier key then push it in modifier
+      //location of 0 == normal keys
+      if (e.location > 0) {
+        customKeys[el.id].modifier.push(key.toLowerCase());
       } else {
-        code += `+${e.key}`;
+        customKeys[el.id].general.push(key.toLowerCase());
+      }
+
+      if (!code) {
+        code = key;
+      } else {
+        code += `+${key}`;
       }
       el.value = code;
     }
   });
+  //reset when user clicks again
   el.addEventListener("focus", () => {
     code = "";
+    customKeys[el.id] = { general: [], modifier: [] };
   });
 });
 
@@ -122,7 +150,9 @@ elements.presets.addEventListener("change", e => {
   changePreset(value);
 });
 
+//save the file when clicked on save button
 elements.saveBtn.addEventListener("click", () => {
+  config["customKeys"] = customKeys; //add custom keys to the config
   fs.writeFileSync(filePath, JSON.stringify(config));
   elements.loginPage.style.display = "flex";
   elements.settingsPage.style.display = "none";
@@ -210,7 +240,9 @@ function lanServer() {
 
     ws.on("message", message => {
       const keyInfo = JSON.parse(message);
-      simulateKey(keyInfo, config.preset);
+      console.log(config.customKeys);
+
+      simulateKey(keyInfo, config.preset, config.customKeys);
     });
 
     ws.on("error", e => console.log(e));
@@ -230,15 +262,6 @@ function lanServer() {
       elements.statusIndicator.style.display = "flex";
     });
   });
-
-  function broadcast(message) {
-    wss.clients.forEach(client => {
-      if (client.room.indexOf(JSON.parse(message).room) > -1) {
-        client.send(message);
-        console.log("message brodcasted");
-      }
-    });
-  }
 }
 
 // lanServer();
@@ -273,7 +296,7 @@ const connectToServer = info => {
   };
 
   ws.onmessage = e => {
-    console.log(e);
+    // console.log(e);
     const res = JSON.parse(e.data);
     const clientsNo = res.connected_clients;
     if (clientsNo) {
@@ -286,7 +309,7 @@ const connectToServer = info => {
         remote.getGlobal("status").isRemoteConnected = false;
       }
     } else {
-      simulateKey(res, config.preset);
+      simulateKey(res, config.preset, config.customKeys);
     }
     // console.log("received: %s", e.data);
   };

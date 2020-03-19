@@ -55,7 +55,21 @@ const simulateArrowKeys = key => {
   }
 };
 
-const simulateKey = (key, preset) => {
+//it will accept the array
+
+const simulateCustomKey = (key, customKeys) => {
+  console.log(customKeys);
+  
+  //we will loop through all the general keys and press
+  customKeys[key.key].general.forEach(el => {
+    console.log(el);
+    //simulate key combination
+    robot.keyToggle(el, key.event, customKeys[key.key].modifier);
+    // robot.keyTap(el, customKeys[key.key].modifier);
+  });
+};
+
+const simulateKey = (key, preset, customKeys) => {
   switch (preset) {
     case "media":
       simulateMediaKeys(key);
@@ -66,7 +80,9 @@ const simulateKey = (key, preset) => {
     case "game":
       simulateGameKeys(key);
       break;
-
+    case "custom":
+      simulateCustomKey(key, customKeys);
+      break;
     default:
       break;
   }

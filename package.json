@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "pack": "electron-builder --dir",
-    "all": "electron-builder -mwl",
+    "all": "electron-builder -l",
     "dist": "electron-builder",
     "start": "electron ."
   },

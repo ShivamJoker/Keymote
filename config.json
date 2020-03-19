@@ -1,2 +1,1 @@
-
-{"preset":"media","id":"350335"}
+{"preset":"custom","id":"350335","customKeys":{"up":{"general":["t"],"modifier":["command"]},"left":{"general":[],"modifier":[]},"middle":{"general":["p"],"modifier":["command"]},"right":{"general":["w"],"modifier":["command"]},"down":{"general":[],"modifier":[]}}}
