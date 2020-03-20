@@ -79,9 +79,6 @@ const createTray = () => {
       ])
     );
 
-    // if (isWindows) {
-    //   tray.on("click", tray.popUpContextMenu);
-    // }
   });
 
   tray.setToolTip("Keymote");

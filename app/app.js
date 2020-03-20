@@ -37,11 +37,34 @@ const keyIds = ["up", "left", "middle", "right", "down"];
 let keyElements = [];
 
 keyIds.forEach(e => {
-  keyElements.push(document.querySelector(`#${e}`));
+  keyElements.push(document.querySelector(`#${e} span`));
 });
+
 const setValueInKeyInputs = preset => {
   keyElements.forEach((el, i) => {
-    el.value = preset[i];
+    el.innerText = preset[i];
+  });
+};
+
+const setCustomValuesInKeyInputs = () => {
+  keyElements.forEach(el => {
+    const modifierKeys = config.customKeys[el.parentElement.id].modifier;
+    modifierKeys.forEach((key, index) => {
+      //if there are more than 1 element we will add +
+      if (index > 0) {
+        el.innerText += ` + ${key}`;
+      } else {
+        el.innerText += key;
+      }
+    });
+    config.customKeys[el.parentElement.id].general.forEach((key, index) => {
+      //if there are more than 1 element we will add +
+      if (modifierKeys.length > 0) {
+        el.innerText += ` + ${key}`;
+      } else {
+        el.innerText += key;
+      }
+    });
   });
 };
 
@@ -55,6 +78,9 @@ const changePreset = preset => {
       break;
     case "arrow":
       setValueInKeyInputs(arrowKeys);
+      break;
+    case "custom":
+      setCustomValuesInKeyInputs();
       break;
     default:
       elements.controllerValues.reset(); //reset all the values
@@ -73,6 +99,11 @@ let customKeys = {
 let code;
 keyElements.forEach((el, i) => {
   console.log(el.id);
+  el.setAttribute("contenteditable", "true");
+  //focus on the span
+  el.parentElement.addEventListener("click", () => {
+    el.focus();
+  });
   el.addEventListener("keydown", e => {
     e.preventDefault();
     console.log(e);
@@ -90,17 +121,17 @@ keyElements.forEach((el, i) => {
       //if its modifier key then push it in modifier
       //location of 0 == normal keys
       if (e.location > 0) {
-        customKeys[el.id].modifier.push(key.toLowerCase());
+        customKeys[el.parentElement.id].modifier.push(key.toLowerCase());
       } else {
-        customKeys[el.id].general.push(key.toLowerCase());
+        customKeys[el.parentElement.id].general.push(key.toLowerCase());
       }
 
       if (!code) {
         code = key;
       } else {
-        code += `+${key}`;
+        code += ` + ${key}`;
       }
-      el.value = code;
+      el.innerText = code;
     }
   });
   //reset when user clicks again

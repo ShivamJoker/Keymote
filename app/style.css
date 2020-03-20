@@ -109,13 +109,20 @@ select {
   margin: 8px;
 }
 
-input[type="text"] {
+#controllerValues {
+  display: flex;
+  align-items: center;
+}
+
+#controllerValues .input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0.5em 0.3em;
   width: 95px;
   height: 80px;
   font-size: 15px;
   text-align: center;
-  display: inline-block;
   border: 2px solid #fff;
   background: transparent;
   color: #fff;
@@ -126,14 +133,31 @@ input[type="text"] {
   margin: 4px;
 }
 
-input[type="text"]:focus {
+#controllerValues span {
+  display: inline-block;
+  word-break: break-all;
+  width: auto;
+  margin: 5px;
+}
+
+[contenteditable]:focus {
+  outline: 0px solid transparent;
+}
+
+#controllerValues .input:focus-within {
   /* border-color: #007bff; */
   outline: none;
-  box-shadow: rgba(255, 255, 255, 0.721) 0px 0px 4px 0px;
+  box-shadow: rgba(255, 255, 255, 0.721) 0px 0px 4px 2px;
 }
 
 #loginCode {
-  width: 150px;
+  text-align: center;
+  border: 2px solid #fff;
+  margin: 4px;
+  background: transparent;
+  color: #fff;
+  border-radius: 4px;
+  width: 120px;
   height: 30px;
   font-size: 20px;
   letter-spacing: 2px;
@@ -183,12 +207,6 @@ button:active {
 }
 #saveBtn {
   /* background: rgb(20, 223, 118); */
-}
-
-#controllerValues {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 #qrcode {
@@ -286,6 +304,7 @@ button:active {
 
 .ipContainer {
   margin-bottom: 10px;
+  display: none;
 }
 
 .connection-mode-container {
